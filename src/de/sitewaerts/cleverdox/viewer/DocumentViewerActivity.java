@@ -775,90 +775,95 @@ public class DocumentViewerActivity
         }
 
         // Handle item selection
-        switch (item.getItemId())
-        {
+        int itemId = item.getItemId();
+//        switch (item.getItemId())
+//        {
             //up navigation
-            case android.R.id.home:
-                finish();
-                return true;
-            case R.id.action_navigation_view:
-                if (getCore() != null)
-                {
-                    OutlineItem outline[] = getCore().getOutline();
-                    if (outline != null)
-                    {
-                        OutlineActivityData.get().items = outline;
-                        Intent intent = new Intent(DocumentViewerActivity.this,
-                                NavigationViewActivity.class
-                        );
-                        //add relevant cordova options
-                        intent.putExtra("closeLabel", navigationViewCloseLabel);
-                        intent.putExtra("bookmarksEnabled", bookmarksEnabled);
-                        startActivityForResult(intent, getOUTLINEREQUEST());
-                    }
+        if (itemId == android.R.id.home) {
+//            case android.R.id.home:
+            finish();
+            return true;
+        } else if (itemId == R.id.action_navigation_view) {
+//            case R.id.action_navigation_view:
+            if (getCore() != null) {
+                OutlineItem outline[] = getCore().getOutline();
+                if (outline != null) {
+                    OutlineActivityData.get().items = outline;
+                    Intent intent = new Intent(DocumentViewerActivity.this,
+                            NavigationViewActivity.class
+                    );
+                    //add relevant cordova options
+                    intent.putExtra("closeLabel", navigationViewCloseLabel);
+                    intent.putExtra("bookmarksEnabled", bookmarksEnabled);
+                    startActivityForResult(intent, getOUTLINEREQUEST());
                 }
-                return true;
-            case R.id.action_open_with:
-                Intent openWithIntent = new Intent(Intent.ACTION_VIEW);
-                openWithIntent.setDataAndType(docUri,
-                        "application/pdf"); //XXX will the app eventually support other document types?
-                openWithIntent.setFlags(
-                        Intent.FLAG_ACTIVITY_NO_HISTORY); //XXX this is from the example, do we want this behaviour?
-                startActivity(Intent.createChooser(openWithIntent,
-                        getString(R.string.open_with_chooser_title)
-                ));
-                return true;
-            case R.id.action_print:
-                if (getCore() != null)
-                {
-                    if (!getCore().fileFormat().startsWith("PDF"))
-                    {
-                        showInfo(getString(
-                                R.string.format_currently_not_supported));
-                        return true;
-                    }
+            }
+            return true;
+        } else if (itemId == R.id.action_open_with) {
+//            case R.id.action_open_with:
+            Intent openWithIntent = new Intent(Intent.ACTION_VIEW);
+            openWithIntent.setDataAndType(docUri,
+                    "application/pdf"); //XXX will the app eventually support other document types?
+            openWithIntent.setFlags(
+                    Intent.FLAG_ACTIVITY_NO_HISTORY); //XXX this is from the example, do we want this behaviour?
+            startActivity(Intent.createChooser(openWithIntent,
+                    getString(R.string.open_with_chooser_title)
+            ));
+            return true;
+        } else if (itemId == R.id.action_print) {
+//            case R.id.action_print:
+            if (getCore() != null) {
+                if (!getCore().fileFormat().startsWith("PDF")) {
+                    showInfo(getString(
+                            R.string.format_currently_not_supported));
+                    return true;
                 }
+            }
 
-                Intent printIntent = new Intent(this, PrintActivity.class);
-                printIntent.setDataAndType(docUri, "application/pdf");
-                printIntent.putExtra("title", getMFileName());
-                printIntent.putExtra("closeLabel", navigationViewCloseLabel);
-                startActivityForResult(printIntent, getPRINTREQUEST());
-                return true;
-            case R.id.action_email:
+            Intent printIntent = new Intent(this, PrintActivity.class);
+            printIntent.setDataAndType(docUri, "application/pdf");
+            printIntent.putExtra("title", getMFileName());
+            printIntent.putExtra("closeLabel", navigationViewCloseLabel);
+            startActivityForResult(printIntent, getPRINTREQUEST());
+            return true;
+        } else if (itemId == R.id.action_email) {
+//            case R.id.action_email:
 
-                Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                //XXX tried various methods to filter only email apps
-                //filter email apps via mime type, still shows some non email apps + we need mime type for attachment
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            //XXX tried various methods to filter only email apps
+            //filter email apps via mime type, still shows some non email apps + we need mime type for attachment
 //	    		emailIntent.setType("message/rfc822");
-                //filter email apps via mailto uri, only works with ACTION_VIEW (we need ACTION_SEND)
+            //filter email apps via mailto uri, only works with ACTION_VIEW (we need ACTION_SEND)
 //	    		Uri data = Uri.parse("mailto:?");
 //	    		emailIntent.setData(data);
-                //filter email apps via category, only works with ACTION_MAIN (we need ACTION_SEND) and launches gmail without showing chooser first
+            //filter email apps via category, only works with ACTION_MAIN (we need ACTION_SEND) and launches gmail without showing chooser first
 //	    		emailIntent.addCategory(Intent.CATEGORY_APP_EMAIL);
-                //TODO research how other people do this (e.g. phonegap share plugin)
+            //TODO research how other people do this (e.g. phonegap share plugin)
 
-                //add document as attachment
-                emailIntent.setType("application/pdf");
-                emailIntent.putExtra(Intent.EXTRA_STREAM, docUri);
-                //add some text to the email
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, title);
-                emailIntent.putExtra(Intent.EXTRA_TEXT,
-                        String.format(getString(R.string.email_text),
-                                getString(R.string.app_name)
-                        )
-                );
-                //choose email app
-                startActivity(Intent.createChooser(emailIntent,
-                        getString(R.string.email_chooser_title)
-                ));
-                return true;
-            case R.id.action_bookmark:
-                //TODO
-                return false;
-            default:
-                return super.onOptionsItemSelected(item);
+            //add document as attachment
+            emailIntent.setType("application/pdf");
+            emailIntent.putExtra(Intent.EXTRA_STREAM, docUri);
+            //add some text to the email
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, title);
+            emailIntent.putExtra(Intent.EXTRA_TEXT,
+                    String.format(getString(R.string.email_text),
+                            getString(R.string.app_name)
+                    )
+            );
+            //choose email app
+            startActivity(Intent.createChooser(emailIntent,
+                    getString(R.string.email_chooser_title)
+            ));
+            return true;
+        } else if (itemId == R.id.action_bookmark) {
+//            case R.id.action_bookmark:
+            //TODO
+            return false;
+        } else {
+//            default:
+            return super.onOptionsItemSelected(item);
         }
+//        }
     }
 
     public void finishActivity(int requestCode) {
